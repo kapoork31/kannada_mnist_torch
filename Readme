@@ -1,0 +1,15 @@
+I use python version 3.9 - I advise to use this version.
+
+install requirements with <pip install - requirements.txt>
+
+Ideally I would have used pipenv in this situation but pytorch has been troublesome with pytorch and my solution led to specific wheels for specific OS's being installed which would be an issue if the person who tries to run this code is not using a mac.
+
+to run, run this code in terminal from the root <python -m src.kannada_mnist.py>
+
+This will take the data from the local folder - format it in the correct way and run a training and evaluation on the dataset.
+
+Plots of results are stored in the plots folder including evaluation training curves for test data split from the training data and also for the Dig dataset which is a useful alternate dataset to test against.
+
+Use the .env file to set batch size, epochs etc
+
+Kaggle results found here - https://www.kaggle.com/code/kapoork318/notebook5d6efd2cd8?scriptVersionId=107459644
