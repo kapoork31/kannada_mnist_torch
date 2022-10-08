@@ -1,5 +1,6 @@
 scikit-learn
 numpy
+tqdm
 python-dotenv
 matplotlib
 torch==1.11.0

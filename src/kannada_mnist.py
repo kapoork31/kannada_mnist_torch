@@ -10,6 +10,7 @@ from torch.optim import Adam
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # load in env variables
 load_dotenv()
@@ -60,16 +61,16 @@ X_train, X_test, y_train, y_test = train_test_split(df_train, target, stratify=t
 # create torch datasets for all datasets for easier path to training.
 train_dataset = KannadaDataClass(images=X_train, labels=y_train, transform=train_transform, classes=10)
 test_dataset = KannadaDataClass(images=X_test, labels=y_test, transform=test_transform, classes=10)
-final_result_test_dataset = KannadaDataClass(images=X_test, labels=None, transform=test_transform, classes=10)
 alternate_test_dataset = KannadaDataClass(images=df_alternate_test, labels=alternate_test_label, transform=test_transform, classes=10)
+final_result_test_dataset = KannadaDataClass(images=df_test, labels=None, transform=test_transform, classes=10)
 
 # Defining the data generators for producing batches of data
 # these dataLoaders are useful for training and evaluation due to how they
 # loop through data in during trianing and evaluation
 train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-final_result_loader = DataLoader(dataset=final_result_test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 alternate_test_loader = DataLoader(dataset=alternate_test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+final_result_loader = DataLoader(dataset=final_result_test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # load the model
 model = Net()
@@ -100,3 +101,17 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['test', 'alternate_test'], loc='upper left')
 plt.savefig('plots/test_accuracy.png')
+
+model.eval()
+predictions = []
+
+for data in tqdm(final_result_loader):
+    data = data.to(device)
+    data = data.permute(0, 3, 1, 2).float()
+    output = model(data).max(dim=1)[1] # argmax
+    predictions += list(output.data.cpu().numpy())
+
+submission = pd.read_csv('data/Kannada-MNIST/sample_submission.csv')
+submission['label'] = predictions
+submission.to_csv('submission.csv', index=False)
+submission.head()
